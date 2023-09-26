@@ -21,6 +21,12 @@ import { LoginVerifyDto } from './dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  @Get('getsignmessage')
+  @HttpCode(HttpStatus.OK)
+  getSignMessage(@Body() dto: GetMessageDto) {
+    return this.authService.getSignMessage(dto);
+  }
+
   @UseGuards(GetMessageTokenGuard)
   @Post('loginverifymessage')
   @HttpCode(HttpStatus.OK)
@@ -32,21 +38,26 @@ export class AuthController {
     return this.authService.loginVerifyMessage(address, nonce, dto);
   }
 
-  @Get('getsignmessage')
+  @UseGuards(RefreshTokenGuard)
+  @Post('refreshtokens')
   @HttpCode(HttpStatus.OK)
-  getSignMessage(@Body() dto: GetMessageDto) {
-    return this.authService.getSignMessage(dto);
+  refreshTokens(
+    @GetDataUser('address') address: string,
+    @GetDataUser('refreshToken') refreshToken: string,
+  ) {
+    return this.authService.getRefreshTokens(address, refreshToken);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@GetDataUser('address') address: string) {
+    return this.authService.logout(address);
   }
 
   @UseGuards(AccessTokenGuard)
   @Get('getme')
   getMe() {
     return 'finally get me';
-  }
-
-  @UseGuards(RefreshTokenGuard)
-  @Post('refresh')
-  refreshTokens() {
-    return 'refreshTokens';
   }
 }

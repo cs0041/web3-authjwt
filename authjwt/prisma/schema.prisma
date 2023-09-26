@@ -15,7 +15,6 @@ model User {
   createAt DateTime @default(now())
   updateAt DateTime @updatedAt
 
-  hash String
   hashedRt String?
 
   @@map("users")

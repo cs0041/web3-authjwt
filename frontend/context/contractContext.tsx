@@ -50,7 +50,7 @@ export const ContractProvider = ({ children }: ChildrenProps) => {
       const signer = provider.getSigner()
       const signedMessage = await signer.signMessage(
         `Please sign this message for login in sphere exchange 
-    address : 0x77db4C729494bDD1D5bB9aE64750FF52s3f4ed2ee nonce: 1695674655751`
+    address : 0x77db4C729494bDD1D5bB9aE64750FF523f4ed2ee nonce: 1695750363848`
       )
       console.log(signedMessage)
       // const contract = getContract()
