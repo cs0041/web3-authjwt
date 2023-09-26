@@ -35,6 +35,7 @@ export class AuthController {
     );
     res.cookie('user_token_getmessage', getmessage_token, {
       expires: new Date(Date.now() + 60 * 60 * 24 * 7), // 7 days),
+      httpOnly: true,
     });
     return { message };
   }
@@ -53,10 +54,12 @@ export class AuthController {
 
     res.cookie('user_token_accesstoken', access_token, {
       expires: new Date(Date.now() + 60 * 60 * 24 * 7), // 7 days),
+      httpOnly: true,
     });
 
     res.cookie('user_token_refreshtoken', refresh_token, {
       expires: new Date(Date.now() + 60 * 60 * 24 * 7), // 7 days),
+      httpOnly: true,
     });
 
     return {};
@@ -75,10 +78,12 @@ export class AuthController {
 
     res.cookie('user_token_accesstoken', access_token, {
       expires: new Date(Date.now() + 60 * 60 * 24 * 7), // 7 days),
+      httpOnly: true,
     });
 
     res.cookie('user_token_refreshtoken', refresh_token, {
       expires: new Date(Date.now() + 60 * 60 * 24 * 7), // 7 days),
+      httpOnly: true,
     });
     return {};
   }
@@ -90,10 +95,14 @@ export class AuthController {
     @GetDataUser('address') address: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    res.cookie('user_token_accesstoken', '', { expires: new Date(Date.now()) });
+    res.cookie('user_token_accesstoken', '', {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+    });
 
     res.cookie('user_token_refreshtoken', '', {
       expires: new Date(Date.now()),
+      httpOnly: true,
     });
     return this.authService.logout(address);
   }
