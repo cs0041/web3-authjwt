@@ -69,8 +69,6 @@ export class AuthService {
 
   async getSignMessage(dto: GetMessageDto): Promise<TokenGetMessage> {
     const nonce = this.getNonce();
-    console.log('address', dto.address);
-    console.log('nonce', nonce);
     const token = await this.getJwtGetMessageTokens({
       address: dto.address,
       nonce,

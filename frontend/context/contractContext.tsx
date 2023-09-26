@@ -9,14 +9,14 @@ import {
   toEtherFloatingPoint,
   toFixUnits,
 } from '../utils/UnitInEther'
-
+import axios from '../utils/axios'
 interface IContract {
-  sendTxFaucet: () => Promise<string | void>
+  login: () => Promise<string | void>
   data: string
 }
 
 export const ContractContext = createContext<IContract>({
-  sendTxFaucet: async () => {},
+  login: async () => {},
   data: '',
 })
 
@@ -43,16 +43,62 @@ export const ContractProvider = ({ children }: ChildrenProps) => {
     setInitialLoading(false)
   }, [])
 
-  const sendTxFaucet = async () => {
+  const login = async () => {
     if (!window.ethereum) return console.log('Please install metamask')
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum as any)
-      const signer = provider.getSigner()
-      const signedMessage = await signer.signMessage(
-        `Please sign this message for login in sphere exchange 
-    address : 0x77db4C729494bDD1D5bB9aE64750FF523f4ed2ee nonce: 1695750363848`
-      )
-      console.log(signedMessage)
+      const accounts = (
+        await window!.ethereum!.request({ method: 'eth_accounts' })
+      )[0]
+      const response = await axios
+        .post(
+          'http://localhost:3333/auth/getsignmessage',
+          { address: accounts },
+          {
+            withCredentials: true,
+          }
+        )
+        .catch((err) => {
+          console.log(err)
+        })
+
+      console.log('response', response)
+      if (response && response.data) {
+        const { message } = response.data
+        const provider = new ethers.providers.Web3Provider(
+          window.ethereum as any
+        )
+        const signer = provider.getSigner()
+        const signedMessage = await signer.signMessage(message)
+        console.log(signedMessage)
+
+        const response2 = await axios
+          .post(
+            'http://localhost:3333/auth/loginverifymessage',
+            { signature: signedMessage },
+            {
+              withCredentials: true,
+            }
+          )
+          .catch((err) => {
+            console.log(err)
+          })
+
+        console.log('response2', response)
+
+        localStorage.setItem('user', accounts)
+        alert('login passss')
+
+        const response3 = await axios
+          .get('http://localhost:3333/auth/getme', {
+            withCredentials: true,
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+
+        console.log('response3', response3)
+      }
+
       // const contract = getContract()
       // const transactionHash = await contract.addNumber()
       // console.log(transactionHash.hash)
@@ -61,7 +107,7 @@ export const ContractProvider = ({ children }: ChildrenProps) => {
       // return transactionHash.hash
     } catch (error: any) {
       // throw new Error(error.reason)
-      alert(error)
+      console.log(error)
     }
   }
 
@@ -79,7 +125,7 @@ export const ContractProvider = ({ children }: ChildrenProps) => {
   return (
     <ContractContext.Provider
       value={{
-        sendTxFaucet,
+        login,
         data,
       }}
     >

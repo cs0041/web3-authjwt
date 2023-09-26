@@ -11,7 +11,10 @@ export class RefreshTokentrategy extends PassportStrategy(
 ) {
   constructor(config: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        RefreshTokentrategy.extractJwtCookies,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       secretOrKey: config.getOrThrow('REFRESH_SECRET_TOKEN'),
       passReqToCallback: true,
     });
@@ -27,5 +30,17 @@ export class RefreshTokentrategy extends PassportStrategy(
       ...payload,
       refreshToken,
     };
+  }
+
+  private static extractJwtCookies(req: Request) {
+    if (
+      req.cookies &&
+      'user_token_refreshtoken' in req.cookies &&
+      req.cookies.user_token_refreshtoken.length > 0
+    ) {
+      return req.cookies.user_token_refreshtoken;
+    }
+
+    return null;
   }
 }
