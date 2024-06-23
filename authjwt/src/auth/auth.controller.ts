@@ -66,7 +66,7 @@ export class AuthController {
   }
 
   @UseGuards(RefreshTokenGuard)
-  @Post('refreshtokens')
+  @Post('getRefreshTokens')
   @HttpCode(HttpStatus.OK)
   async refreshTokens(
     @GetDataUser('address') address: string,
